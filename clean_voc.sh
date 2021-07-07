@@ -1,0 +1,1 @@
+rm *.png *.xml -rf

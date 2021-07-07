@@ -12,14 +12,11 @@
 from lxml import etree
  
 class GEN_Annotations:
-    def __init__(self, filename):
+    def __init__(self):
         self.root = etree.Element("annotation")
  
         child1 = etree.SubElement(self.root, "folder")
         child1.text = "VOC2007"
- 
-        child2 = etree.SubElement(self.root, "filename")
-        child2.text = filename
  
         child3 = etree.SubElement(self.root, "source")
  
@@ -42,9 +39,11 @@ class GEN_Annotations:
         heightn.text = str(height)
         channeln = etree.SubElement(size, "depth")
         channeln.text = str(channel)
+
     def savefile(self,filename):
         tree = etree.ElementTree(self.root)
         tree.write(filename, pretty_print=True, xml_declaration=False, encoding='utf-8')
+
     def add_pic_attr(self,label,xmin,ymin,width,height):
         object = etree.SubElement(self.root, "object")
         namen = etree.SubElement(object, "name")
@@ -59,10 +58,14 @@ class GEN_Annotations:
         ymaxn = etree.SubElement(bndbox, "ymax")
         ymaxn.text = str(ymin+height)
  
+    def setImageFileName(self,filename):
+        child2 = etree.SubElement(self.root, "filename")
+        child2.text = filename
  
 if __name__ == '__main__':
     filename="000001.jpg"
-    anno= GEN_Annotations(filename)
+    anno= GEN_Annotations()
+    anno.setImageFileName(filename)
     anno.set_size(1280,720,3)
     for i in range(3):
         xmin=i+1
