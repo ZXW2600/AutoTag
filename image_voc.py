@@ -28,8 +28,9 @@ class image_voc:
         self.anno.add_pic_attr(tag_name,xmin,ymin,width,height)
 
     def writeFile(self,image_index):
-        image_filename =str(image_index).zfill(6)+".png"
-        annotation_filename =str(image_index).zfill(6)+".xml"
+        image_filename ="./VOC/"+str(image_index).zfill(6)+".png"
+        annotation_filename ="./VOC/"+str(image_index).zfill(6)+".xml"
+        print(image_filename)
         cv2.imwrite(image_filename,self.image)
         self.anno.setImageFileName(image_filename)
         self.anno.savefile(annotation_filename)

@@ -130,6 +130,21 @@ class SCSController:
         elif scs_error != 0:
             print("%s" % self. packetHandler.getRxPacketError(scs_error))
 
+    def setAcc(self,id, acc):
+        # Write SCServo acc
+        scs_comm_result, scs_error = self.packetHandler.write1ByteTxRx(self.portHandler, id, ADDR_STS_GOAL_ACC, acc)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
+        elif scs_error != 0:
+            print("%s" % self.packetHandler.getRxPacketError(scs_error))
+    def setSpeed(self,id, speed):
+        # Write SCServo speed
+        scs_comm_result, scs_error = self.packetHandler.write2ByteTxRx(self.portHandler, id, ADDR_STS_GOAL_SPEED, speed)
+        if scs_comm_result != COMM_SUCCESS:
+            print("%s" % self.packetHandler.getTxRxResult(scs_comm_result))
+        elif scs_error != 0:
+            print("%s" % self.packetHandler.getRxPacketError(scs_error))
+
     def Close(self):
         # Close port
         self.portHandler.closePort()
