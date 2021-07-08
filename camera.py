@@ -12,7 +12,6 @@ import cv2
 import numpy as np
 
 
-
 def pointInRectangle(point, rectangle):
     x, y, w, h = rectangle
     if (point[0] > x and point[0] < w+x) and (point[1] > y or point[1] < h+y):
@@ -25,29 +24,71 @@ def pointInRectangle(point, rectangle):
 
 class Camera:
     def __init__(self, camera_index):
-        self.threshold=50
-        cv2.namedWindow("threshold")
-        cv2.createTrackbar("threshold", "threshold", 0, 255, self.threshold_callback)
-        self.camera = cv2.VideoCapture(camera_index)
-        self.camera.set(3, 1920)  # width=1920
-        self.camera.set(4, 1080)  # height=1080
-    def threshold_callback(self,threshold):
-        self.threshold=threshold
+        self.threshold = 50
+        self.method = 0
+        self.source = 0
+        self.adaptiveThreshold_block = 601
+        self.adaptiveThreshold_C = 30
 
-    
+        cv2.namedWindow("threshold")
+        cv2.createTrackbar("threshold", "threshold", 0,
+                           255, self.threshold_callback)
+        cv2.createTrackbar("block", "threshold", 0,
+                           500, self.adaptive_threshold_block_callback)
+        cv2.createTrackbar("C", "threshold", 0,
+                           100, self.adaptive_threshold_C_callback)
+        cv2.createTrackbar("method", "threshold", 0, 2, self.method_callback)
+        cv2.createTrackbar("source", "threshold", 0, 1, self.source_callback)
+
+        self.camera = cv2.VideoCapture(camera_index)
+        self.camera.set(3, 1080)  # width=1920
+        self.camera.set(4, 720)  # height=1080
+
+    def threshold_callback(self, threshold):
+        self.threshold = threshold
+
+    def adaptive_threshold_C_callback(self, threshold):
+        self.adaptiveThreshold_C = threshold
+
+    def adaptive_threshold_block_callback(self, threshold):
+        self.adaptiveThreshold_block = threshold*2+3
+
+    def method_callback(self, method):
+        self.method = method
+
+    def source_callback(self, source):
+        self.source = source
+
     def takeAndWritePicture(self, object_tag=""):
         """[拍照并检测物体位置]
         Args:
             object_tag ([type]): [标签]
         """
         _, pic = self.camera.read()
-        pic_gray = cv2.cvtColor(pic, cv2.COLOR_BGR2GRAY)
-        # pic_threshold=cv2.adaptiveThreshold(pic_gray,255,cv2.ADAPTIVE_THRESH_GAUSSIAN_C,cv2.THRESH_BINARY,adaptiveThreshold_block,adaptiveThreshold_C)
-        ret, pic_threshold = cv2.threshold(pic_gray, self.threshold, 255, cv2.THRESH_BINARY_INV)
+        if self.source == 0:
+            pic_gray = cv2.cvtColor(pic, cv2.COLOR_BGR2GRAY)
+        if self.source == 1:
+            pic_hsv = cv2.cvtColor(pic, cv2.COLOR_BGR2HSV)
+            pic_h = cv2.split(pic_hsv)[0]  # H通道
+            pic_s = cv2.split(pic_hsv)[1]  # S通道
+            pic_v = cv2.split(pic_hsv)[2]  # V通道
+            pic_gray=255-pic_s
+        if(self.method == 0):
+            pic_threshold = cv2.adaptiveThreshold(pic_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
+                                                  cv2.THRESH_BINARY, self.adaptiveThreshold_block, self.adaptiveThreshold_C)
+            pic_threshold = 255-pic_threshold
+
+        if(self.method == 1):
+            ret, pic_threshold = cv2.threshold(
+                pic_gray, self.threshold, 255, cv2.THRESH_BINARY_INV)
+
+        if(self.method == 2):
+            ret, pic_threshold = cv2.threshold(
+                pic_gray, self.threshold, 255, cv2.THRESH_OTSU)
+            pic_threshold = 255-pic_threshold
         kernel = cv2.getStructuringElement(cv2.MORPH_ELLIPSE, (15, 15))
         pic_open = cv2.morphologyEx(pic_threshold, cv2.MORPH_OPEN, kernel)
-        # pic_open = 255-pic_open
-        cv2.imshow("open",pic_open)
+        cv2.imshow("open", pic_open)
         sp = pic.shape
         height = sp[0]  # height(rows) of image
         width = sp[1]  # width(colums) of image
@@ -85,7 +126,8 @@ class Camera:
 if __name__ == "__main__":
     demo = Camera(0)
     while True:
-        ret, pic, pic_tag, x_1, y_1, w_1, h_1 = demo.takeAndWritePicture("demo")
+        ret, pic, pic_tag, x_1, y_1, w_1, h_1 = demo.takeAndWritePicture(
+            "demo")
         cv2.imshow("test", pic_tag)
         # cv2.imwrite("000.png", pic)
         cv2.waitKey(1)
