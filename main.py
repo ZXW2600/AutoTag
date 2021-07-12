@@ -34,8 +34,8 @@ servo.WritePosition(2, 0)
 
 
 def servo_set_low_speed():
-    servo.setSpeed(2, 800)
-    servo.setSpeed(1, 800)
+    servo.setSpeed(2, 400)
+    servo.setSpeed(1, 400)
     servo.setAcc(1, 0)
     servo.setAcc(2, 0)
 
@@ -48,7 +48,7 @@ def servo_set_high_speed():
 
 
 """创建相机"""
-camera = Camera(0)
+camera = Camera(2)
 
 
 """转盘转动角度范围"""
