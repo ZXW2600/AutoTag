@@ -32,7 +32,7 @@ class image_voc:
         annotation_filename ="./VOC/"+str(image_index).zfill(6)+".xml"
         print(image_filename)
         cv2.imwrite(image_filename,self.image)
-        self.anno.setImageFileName(image_filename)
+        self.anno.setImageFileName(str(image_index).zfill(6)+".png")
         self.anno.savefile(annotation_filename)
 
 if __name__ == "__main__":
