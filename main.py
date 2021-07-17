@@ -100,8 +100,8 @@ def angle1_min_callback(angle):
     global angle1_min
     global angle1_min_servo
     angle1_min = angle
-    servo.WritePosition(1, int(2047-angle/360*4096))
-    angle1_min_servo = int(2047-angle/360*4096)
+    servo.WritePosition(1, int(2047+angle/360*4096))
+    angle1_min_servo = int(2047+angle/360*4096)
 
 
 def angle1_max_callback(angle):
@@ -109,8 +109,8 @@ def angle1_max_callback(angle):
     global angle1_max_servo
     global servo
     angle1_max = angle
-    servo.WritePosition(1, int(2047-angle/360*4096))
-    angle1_max_servo = int(2047-angle/360*4096)
+    servo.WritePosition(1, int(2047+angle/360*4096))
+    angle1_max_servo = int(2047+angle/360*4096)
 
 
 def angle_step_callback(angle):
@@ -153,10 +153,10 @@ cv2.createTrackbar("dial angle", "setting", 0, 360, angle0_callback)
 cv2.createTrackbar("camera-angle-low", "setting", 0, 90, angle1_min_callback)
 cv2.createTrackbar("camera-angle-high", "setting", 0, 90, angle1_max_callback)
 cv2.createTrackbar("angle_step", "setting", 0, 60, angle_step_callback)
-# cv2.createButton("start", start_button_callback)
-# cv2.createButton("pause", pause_button_callback)
-# cv2.createButton("stop", stop_button_callback)
-# cv2.createButton("exit", exit_button_callback)
+cv2.createButton("start", start_button_callback)
+cv2.createButton("pause", pause_button_callback)
+cv2.createButton("stop", stop_button_callback)
+cv2.createButton("exit", exit_button_callback)
 
 
 cv2.waitKey(1)  # 刷新界面
@@ -203,7 +203,7 @@ while g_state is not State.EXIT:
         if angle0 <= angle0_max_servo:
             angle0 += angle_step_servo
         else:
-            angle1 -= angle_step_servo
+            angle1 += angle_step_servo
             angle0 = angle0_min_servo
             print("one turn finished!")
             servo.WritePosition(2, angle0)
@@ -212,11 +212,11 @@ while g_state is not State.EXIT:
             time.sleep(2)
             servo_set_low_speed()
 
-        if angle1 < angle1_max_servo:
+        if angle1 > angle1_max_servo:
             g_state = State.STOP
             print("all finished! stop!")
         servo.WritePosition(2, angle0)
-        servo.WritePosition(1, angle1)
+        servo.WritePosition(1, -angle1)
         time.sleep(0.2)
 
 
