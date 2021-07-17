@@ -34,8 +34,8 @@ servo.WritePosition(2, 0)
 
 
 def servo_set_low_speed():
-    servo.setSpeed(2, 400)
-    servo.setSpeed(1, 400)
+    servo.setSpeed(2, 600)
+    servo.setSpeed(1, 600)
     servo.setAcc(1, 0)
     servo.setAcc(2, 0)
 
@@ -153,10 +153,10 @@ cv2.createTrackbar("dial angle", "setting", 0, 360, angle0_callback)
 cv2.createTrackbar("camera-angle-low", "setting", 0, 90, angle1_min_callback)
 cv2.createTrackbar("camera-angle-high", "setting", 0, 90, angle1_max_callback)
 cv2.createTrackbar("angle_step", "setting", 0, 60, angle_step_callback)
-cv2.createButton("start", start_button_callback)
-cv2.createButton("pause", pause_button_callback)
-cv2.createButton("stop", stop_button_callback)
-cv2.createButton("exit", exit_button_callback)
+# cv2.createButton("start", start_button_callback)
+# cv2.createButton("pause", pause_button_callback)
+# cv2.createButton("stop", stop_button_callback)
+# cv2.createButton("exit", exit_button_callback)
 
 
 cv2.waitKey(1)  # 刷新界面
@@ -174,14 +174,21 @@ while g_state is not State.EXIT:
         servo.WritePosition(1, angle1)
         servo_set_high_speed()
         time.sleep(2)
-        servo_set_low_speed() 
+        servo_set_low_speed()
         g_state = State.RUNNING
 
     # 采集照片并显示
     ret, pic, pic_tag, xmin, ymin, width, height = camera.takeAndWritePicture(
         tag_name)
     cv2.imshow("Real-time view", pic_tag)
-    cv2.waitKey(1)
+    key = cv2.waitKey(1)
+
+    if key == 'q':
+        exit_button_callback()
+    if key == 's':
+        start_button_callback()
+    if key == 'd':
+        stop_button_callback()
 
     # 保存照片和标注
     if g_state is State.RUNNING:
@@ -204,7 +211,6 @@ while g_state is not State.EXIT:
             servo_set_high_speed()
             time.sleep(2)
             servo_set_low_speed()
-
 
         if angle1 < angle1_max_servo:
             g_state = State.STOP

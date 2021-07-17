@@ -1,5 +1,6 @@
 *.pyc
 *.png
 *.xml
+*.zip
 __pycache__
 VOC
