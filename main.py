@@ -183,11 +183,11 @@ while g_state is not State.EXIT:
     cv2.imshow("Real-time view", pic_tag)
     key = cv2.waitKey(1)
 
-    if key == 'q':
+    if key == 113:
         exit_button_callback()
-    if key == 's':
+    if key == 97:
         start_button_callback()
-    if key == 'd':
+    if key == 115:
         stop_button_callback()
 
     # 保存照片和标注
