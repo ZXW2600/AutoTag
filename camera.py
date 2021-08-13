@@ -30,6 +30,11 @@ class Camera:
         self.adaptiveThreshold_block = 601
         self.adaptiveThreshold_C = 30
 
+        self.width_start = 0
+        self.width_stop = 1080
+        self.height_start = 0
+        self.height_stop = 720
+
         cv2.namedWindow("threshold")
         cv2.createTrackbar("threshold", "threshold", 0,
                            255, self.threshold_callback)
@@ -43,6 +48,29 @@ class Camera:
         self.camera = cv2.VideoCapture(camera_index)
         self.camera.set(3, 1080)  # width=1920
         self.camera.set(4, 720)  # height=1080
+
+        cv2.namedWindow("ROI")
+
+        cv2.createTrackbar("width start", "ROI", 0, 1080, self.wstart_callback)
+        cv2.createTrackbar("width stop", "ROI", 0, 1080, self.wstop_callback)
+        cv2.createTrackbar("height start", "ROI", 0, 720, self.hstart_callback)
+        cv2.createTrackbar("height stop", "ROI", 0, 720, self.hstop_callback)
+
+    def wstart_callback(self, aim):
+        if aim < self.width_stop:
+            self.width_start = aim
+
+    def wstop_callback(self, aim):
+        if aim > self.width_start:
+            self.width_stop = aim
+
+    def hstart_callback(self, aim):
+        if aim<self.width_stop:
+            self.height_start = aim
+
+    def hstop_callback(self, aim):
+        if aim>self.width_start:
+            self.height_stop = aim
 
     def threshold_callback(self, threshold):
         self.threshold = threshold
@@ -65,6 +93,7 @@ class Camera:
             object_tag ([type]): [标签]
         """
         _, pic = self.camera.read()
+        pic=pic[self.height_start:self.height_stop,self.width_start:self.width_stop]
         if self.source == 0:
             pic_gray = cv2.cvtColor(pic, cv2.COLOR_BGR2GRAY)
         if self.source == 1:
@@ -72,7 +101,7 @@ class Camera:
             pic_h = cv2.split(pic_hsv)[0]  # H通道
             pic_s = cv2.split(pic_hsv)[1]  # S通道
             pic_v = cv2.split(pic_hsv)[2]  # V通道
-            pic_gray=255-pic_s
+            pic_gray = 255-pic_s
         if(self.method == 0):
             pic_threshold = cv2.adaptiveThreshold(pic_gray, 255, cv2.ADAPTIVE_THRESH_GAUSSIAN_C,
                                                   cv2.THRESH_BINARY, self.adaptiveThreshold_block, self.adaptiveThreshold_C)

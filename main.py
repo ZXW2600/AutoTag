@@ -48,7 +48,7 @@ def servo_set_high_speed():
 
 
 """创建相机"""
-camera = Camera(2)
+camera = Camera(0)
 
 
 """转盘转动角度范围"""
@@ -68,6 +68,9 @@ angle_step = 10
 angle_step_servo = int(10/360*4096)
 
 """状态设置"""
+
+
+'''photo ROI seeting'''
 
 
 class State(Enum):
@@ -153,6 +156,10 @@ cv2.createTrackbar("dial angle", "setting", 0, 360, angle0_callback)
 cv2.createTrackbar("camera-angle-low", "setting", 0, 90, angle1_min_callback)
 cv2.createTrackbar("camera-angle-high", "setting", 0, 90, angle1_max_callback)
 cv2.createTrackbar("angle_step", "setting", 0, 60, angle_step_callback)
+
+
+
+
 cv2.createButton("start", start_button_callback)
 cv2.createButton("pause", pause_button_callback)
 cv2.createButton("stop", stop_button_callback)
